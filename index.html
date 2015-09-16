@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+	<meta charset="GBK">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>华天旅游网 2015年亚洲男篮锦标赛 售票专区</title>
+	<script src="bower_components/avalon/dist/avalon.js"></script>
+	<script src="bower_components/jquery-1.11.3.min/index.js"></script>
+	<script>
+		// 计算价格函数
+		function computPrice(){
+			if (typeof($('#payTypePrice').val())!='undefined') {
+				//$('.individualgetBudget').val(0);
+				/*console.log('DO comput price.',$('.individualbudget').val().split('|')[1],$('.individualtravleperson').val());*/
+				var totalPrice = $('.individualbudget').val().split('|')[1] * $('.individualtravleperson').val();
+				/*console.log(totalPrice);*/
+				$('.individualgetBudget').val(totalPrice);
+
+				if ($('#qupiaofangshi').val() == 'kuaidi') {
+					$('.individualgetBudget').val(parseInt($('.individualgetBudget').val()) + parseInt(10));
+				}
+			}
+		}
+
+		$(document).ready(function(){
+			$('.individualbudget, .individualtravleperson').bind('click',function(){
+				computPrice();
+			});
+			computPrice();
+		});
+
+		//取票方式
+		function getTicketMethod(){
+			if ($('#qupiaofangshi').val()=='ziqu'){
+				$('.spdz').hide();
+				$('.contactemail').val('');
+			}else{
+				$('.spdz').show();
+			}
+			computPrice();
+		}
+
+		function doSubmit(){
+			if (typeof($('#payTypePrice').val())!='undefined') {
+				$('.ibudget').val($('.individualbudget').val().split('|')[0]);
+				//$('#payForm').submit();
+				var errMsg = '';
+				if ($('#payTypePrice').val() == '') {
+					errMsg += '您尚未选择球票\n';
+				}
+				if ($('.xingming').val() == '') {
+					errMsg += '请填写联系人姓名\n';
+				}
+				if ($('.dianhua').val() == '') {
+					errMsg += '请填写联系人电话\n';
+				}
+				if ($('#qupiaofangshi').val() == 'kuaidi') {
+					if ($('.contactemail').val() == '') {
+						errMsg += '请填写送票地址\n';
+					}
+				}
+				if (errMsg.length > 0) {
+					alert(errMsg);
+				} else {
+					$('#payForm').submit();
+				}
+			}
+		}
+
+		avalon.ready(function () {
+			var InfoTableVM = avalon.define({
+				$id: 'infotable',
+				list: []
+			});
+
+			var PayInfoVM = avalon.define({
+				$id: 'payinfo',
+				list: [],
+				destination: '',
+				others: '',
+				personrelation: '' //查询关系 中国队还是非中国队
+			});
+			avalon.scan();
+			$.getJSON('/common/websinfo_queryWebsInfos.action?submit=ajax&infoClass=720&pageSize=999', function (result) {
+				InfoTableVM.list = result;
+				for (var i = 0; i < InfoTableVM.list.length; i++) {
+					InfoTableVM.list[i].infoText = InfoTableVM.list[i].description.split("&nbsp;");
+				}
+			});
+
+			$('#plist').delegate('.data-col td', 'click', function () {
+				PayInfoVM.destination = $(this).parent().attr('destination');
+				PayInfoVM.others = $(this).parent().attr('hideinfo').replace(new RegExp('&nbsp;', 'g'), ' ');
+				PayInfoVM.personrelation = $(this).parent().attr('ptype');
+
+				$.getJSON('/common/websinfo_queryWebsInfos.action?submit=ajax&infoClass=719&infoName=' + encodeURI($(this).parent().attr('ptype')), function (result) {
+					PayInfoVM.list = result;
+				}).done(function () {
+					$(window).scrollTop($('#payForm').offset().top);
+					setTimeout(function(){
+						console.log(1);
+						computPrice();
+					},500);
+				});
+			});
+		});
+	</script>
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+			font: 12px/20px 'Microsoft YaHei', '微软雅黑', simsun;
+			padding-bottom: 200px;
+		}
+
+		img {
+			display: block;
+			max-width:100%;
+		}
+
+		#main-section {
+			width: 800px;
+			max-width:100%;
+			margin: 0 auto;
+		}
+
+		#plist {
+			width: 100%;
+		}
+
+		.left {
+			text-align: left;
+		}
+
+		.right {
+			text-align: right;
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		#plist td {
+			background-color: #EFEFEF;
+			font-size: 14px;
+			line-height: 200%;
+			padding: 0 1em;
+		}
+
+		.bold {
+			font-weight: bold;
+		}
+
+		#plist tr.data-col:hover td {
+			background-color: rgb(249, 248, 249);
+			color: #F00;
+			cursor: pointer;
+		}
+
+		#noti {
+			font-size: 14px;
+			color: #F00;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		#plist td.head {
+			background-color: #5DB95B;
+			color: #FFF;
+		}
+	</style>
+</head>
+<body>
+<div id="main-section">
+	<img src="./images/xuanchuan1.jpg" alt=""/>
+	<img src="./images/xuanchuan2.jpg" alt=""/>
+	<img src="./images/xuanchuan3.jpg" alt=""/>
+
+	<p id="noti">&darr;&darr;点击下列场次开始购买球票&darr;&darr;</p>
+	<table id="plist" ms-controller="infotable">
+		<tr>
+			<td class="head center">日期 时间</td>
+			<td class="head center">地点</td>
+			<td class="head center">比赛</td>
+			<td class="head center">小组</td>
+			<td class="head center">球队</td>
+		</tr>
+		<tr class="data-col" ms-repeat-unit="list" ms-attr-ptype="{{unit.info_name}}"
+		    ms-attr-hideinfo="{{unit.description}}" ms-attr-destination="{{unit.infoText[5]}}">
+			<td class="left">{{unit.infoText[0]}} {{unit.infoText[1]}}</td>
+			<td class="center">{{unit.infoText[2]}}</td>
+			<td class="center">{{unit.infoText[3]}}</td>
+			<td class="center">{{unit.infoText[4]}}</td>
+			<td class="center">{{unit.infoText[5]}}</td>
+		</tr>
+	</table>
+	<!--
+		private String destination; //    关键字 那个对对那个对
+		private String travleperson; // 出游人数 最多10个
+		private String budget; //   价格
+		private String others; //  比赛信息
+		private String contactman ; //联系人
+		private String contactphone ; //联系电话
+		private String contactemail ; // 地址
+		personrelation 查询关系 中国队还是非中国队
+		travlegoal  支付类型 支付宝 微信
+		sample:individual.status
+	-->
+	<form action="http://www.htyou.com/tour/individual_addTickets.action" ms-controller="payinfo" method="post"
+	      target="_blank" id="payForm">
+		<table id="pay-info" style="background-color:azure; width:100%;">
+			<tr>
+				<td>球票信息：</td>
+				<td colspan="3">
+					{{others}}
+					<input class="readonly" type="hidden" name="individual.destination" id="individual.destination"
+					       readonly
+					       ms-attr-value="{{destination}}" style="width:90%;"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					球票价格：
+				</td>
+				<td>
+					<select class="individualbudget" id="payTypePrice">
+						<option ms-repeat-unit="list" ms-attr-value="{{unit.info_id}}|{{unit.origin}}">
+							{{unit.description}}-{{unit.origin}}元
+						</option>
+					</select>
+
+				</td>
+				<td>球票数量：</td>
+				<td>
+					<select name="individual.travleperson" id="individual.travleperson" class="individualtravleperson">
+						<option value="1">1人</option>
+						<option value="2">2人</option>
+						<option value="3">3人</option>
+						<option value="4">4人</option>
+						<option value="5">5人</option>
+						<option value="6">6人</option>
+						<option value="7">7人</option>
+						<option value="8">8人</option>
+						<option value="9">9人</option>
+						<option value="10">10人</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>联系人姓名：</td>
+				<td>
+					<input type="text" name="individual.contactman" id="individual.contactman" class="xingming" value=""/>
+				</td>
+				<td>联系人电话：</td>
+				<td>
+					<input type="text" name="individual.contactphone" id="individual.contactphone" class="dianhua" value=""/>
+				</td>
+			</tr>
+			<tr>
+				<td>取票方式：</td>
+				<td>
+					<select name="qupiaofangshi" id="qupiaofangshi" onChange="getTicketMethod()">
+						<option value="ziqu">上门自取</option>
+						<option value="kuaidi">快递寄送</option>
+					</select>
+				</td>
+				<td>
+					<span class="spdz" style="display:none;">送票地址：</span>
+				</td>
+				<td>
+					<span class="spdz" style="display:none;">
+						<input type="text" name="individual.contactemail" id="individual.contactemail" class="contactemail" value=""/>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td>支付方式：</td>
+				<td>
+					<select name="individual.travlegoal" id="individual.travlegoal">
+						<option value="121601">支付宝</option>
+						<option value="121603">微信</option>
+					</select>
+				</td>
+				<td>比赛类型：</td>
+				<td>
+					<input type="text" name="individual.personrelation" id="individual.personrelation" readonly
+					       ms-attr-value="{{personrelation}}"/>
+				</td>
+			</tr>
+			<tr>
+				<td>当前价格：</td>
+				<td>
+					<input class="readonly individualgetBudget" readonly type="text" name="individual.getBudget" id="individual.getBudget"
+					       value="0"/>
+				</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+		<input type="button" onclick="doSubmit()" value="提交订单" style="display:block; margin:0 auto;"/>
+		<input type="hidden" name="individual.others" id="individual.others" ms-attr-value="{{others}}"/>
+		<input type="hidden" name="individual.budget" id="individual.budget" class="ibudget" value=""/>
+
+		<div>
+			<ul style="color:#F00; display:block;">
+				<li>邮寄球票说明：17：30以前下单，当天可以寄出，节假日顺延。该短信将作为购买凭证.请妥善保存.</li>
+				<li>上门取票说明：工作日8.30-17.30 可以上门取票.取票地址：湖南长沙解放东路300号华天大酒店中栋8楼804房间. 该短信将作为购买凭证.请妥善保存.</li>
+				<li>邮寄费用说明：选择快递寄送 当前价格要增加10元，地址为必填项，上门自取送票地址非必填项</li>
+				<li>其他说明：超过10张票请联系我们的客服电话：0731-84500002</li>
+				<li>如有疑问致电：0731-84500002</li>
+			</ul>
+		</div>
+	</form>
+</div>
+
+</body>
+</html>

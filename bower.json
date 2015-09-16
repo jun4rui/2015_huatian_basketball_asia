@@ -1,0 +1,22 @@
+{
+  "name": "Jun4rui",
+  "version": "0.1",
+  "authors": [
+    "jun4rui <jun4rui@gmail.com>"
+  ],
+  "description": "2015年篮球票项目",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "avalon": "~1.5.1",
+    "amazeui":"amazeui#~2.4.2",
+    "jquery-1.11.3.min": "http://code.jquery.com/jquery-1.11.3.min.js"
+  }
+}
