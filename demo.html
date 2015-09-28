@@ -13,7 +13,7 @@
 			if (typeof($('#payTypePrice').val())!='undefined') {
 				//$('.individualgetBudget').val(0);
 				/*console.log('DO comput price.',$('.individualbudget').val().split('|')[1],$('.individualtravleperson').val());*/
-				var totalPrice = $('.individualbudget').val().split('|')[1] * $('.individualtravleperson').val();
+				//var totalPrice = $('.individualbudget').val().split('|')[1] * $('.individualtravleperson').val();
 				/*console.log(totalPrice);*/
 				$('.individualgetBudget').val(totalPrice);
 
@@ -27,7 +27,7 @@
 			$('.individualbudget, .individualtravleperson').bind('click',function(){
 				computPrice();
 			});
-			computPrice();
+			//computPrice();
 		});
 
 		//取票方式
@@ -187,12 +187,12 @@
 			<td class="head center">球队</td>
 		</tr>
 		<tr class="data-col" ms-repeat-unit="list" ms-attr-ptype="{{unit.info_name}}"
-		    ms-attr-hideinfo="{{unit.description}}" ms-attr-destination="{{unit.infoText[5]}}">
-			<td class="left">{{unit.infoText[0]}} {{unit.infoText[1]}}</td>
-			<td class="center">{{unit.infoText[2]}}</td>
-			<td class="center">{{unit.infoText[3]}}</td>
-			<td class="center">{{unit.infoText[4]}}</td>
-			<td class="center">{{unit.infoText[5]}}</td>
+		    ms-attr-hideinfo="{{unit.description}}" ms-attr-destination="{{unit.description}}">
+			<td class="left">unit.infoText[0] unit.infoText[1]</td>
+			<td class="center">unit.infoText[2]</td>
+			<td class="center">unit.infoText[3]</td>
+			<td class="center">unit.infoText[4]</td>
+			<td class="center">unit.infoText[5]</td>
 		</tr>
 	</table>
 	<!--
